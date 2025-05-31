@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, Numeric
+from sqlalchemy import Boolean, Column, Date, Integer, Numeric, String
+
 from .database import Base
 
 
@@ -10,6 +11,7 @@ class Bill(Base):
     due_day = Column(Integer, nullable=False)
     amount = Column(Numeric(10, 2), nullable=False)
     paid = Column(Boolean, default=False)
+
 
 class Config(Base):
     __tablename__ = "config"

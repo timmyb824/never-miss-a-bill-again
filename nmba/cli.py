@@ -1,11 +1,13 @@
-import typer
 import datetime
+
+import apprise
+import typer
 from rich.console import Console
 from rich.table import Table
 from sqlalchemy.orm import Session
+
 from nmba.data.database import SessionLocal
 from nmba.data.models import Bill, Config
-import apprise
 
 app = typer.Typer()
 console = Console()
