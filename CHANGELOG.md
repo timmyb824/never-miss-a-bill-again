@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.3 (2025-05-31)
+
+### Continuous Integration
+
+- Add verbose option for PyPI publish step
+  ([`66a40f4`](https://github.com/timmyb824/never-miss-a-bill-again/commit/66a40f49fe0c3f35f25d2a21b9f44061491d85ba))
+
+
 ## v1.0.2 (2025-05-31)
 
 ### Chores
