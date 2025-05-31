@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.5 (2025-05-31)
+
+### Refactoring
+
+- Update installation command to use the full package name
+  ([`0a465bb`](https://github.com/timmyb824/never-miss-a-bill-again/commit/0a465bb1df73c1cb097e0ae308899bfa58f5bdc7))
+
+
 ## v1.0.4 (2025-05-31)
 
 ### Documentation
