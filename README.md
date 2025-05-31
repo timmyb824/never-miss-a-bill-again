@@ -14,7 +14,7 @@ Never Miss a Bill Again (NMBA) is a command-line tool to help you never miss a b
 ## Installation
 
 ```bash
-pip install nmba
+pip install never-miss-a-bill-again
 ```
 
 ## Usage
