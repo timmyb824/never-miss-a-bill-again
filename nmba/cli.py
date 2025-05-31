@@ -201,5 +201,36 @@ def mark_all_unpaid():
     console.print(f"[green]Marked {updated} bill(s) as unpaid.[/green]")
 
 
+@app.command()
+def import_csv(path: str = typer.Argument(..., help="Path to CSV file with bills")):
+    """Import bills from a CSV file. Required columns: name, recipient, due_day, amount. Optional: paid."""
+    import csv
+
+    db: Session = next(get_db())
+    added = 0
+    skipped = 0
+    with open(path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        required = {'name', 'recipient', 'due_day', 'amount'}
+        missing = required - set(reader.fieldnames or [])
+        if missing:
+            console.print(f"[red]Missing required columns: {', '.join(missing)}[/red]")
+            raise typer.Exit(1)
+        for i, row in enumerate(reader, 1):
+            try:
+                name = row['name'].strip()
+                recipient = row['recipient'].strip()
+                due_day = int(row['due_day'])
+                amount = float(row['amount'])
+                paid = str(row.get('paid', '')).strip().lower() in ('true', '1', 'yes')
+                db.add(Bill(name=name, recipient=recipient, due_day=due_day, amount=amount, paid=paid))
+                added += 1
+            except Exception as e:
+                skipped += 1
+                console.print(f"[yellow]Skipping row {i}: {e}[/yellow]")
+        db.commit()
+    console.print(f"[green]Imported {added} bill(s). Skipped {skipped} row(s).[/green]")
+
+
 if __name__ == "__main__":
     app()
