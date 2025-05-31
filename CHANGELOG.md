@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-05-31)
+
+### Features
+
+- **cli**: Add edit_bill command to edit bill by ID
+  ([`2d84e69`](https://github.com/timmyb824/never-miss-a-bill-again/commit/2d84e69957c981a9d2ee4a293603dfd47d40a0b6))
+
+
 ## v1.1.0 (2025-05-31)
 
 ### Features
