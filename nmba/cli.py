@@ -73,7 +73,7 @@ def notify(
     db = next(get_db())
     today = datetime.date.today()
     due_days = [(today.day + i - 1) % 31 + 1 for i in range(lookahead_days)]
-    bills = db.query(Bill).filter(Bill.paid == False, Bill.due_day.in_(due_days)).all()
+    bills = db.query(Bill).filter(not Bill.paid, Bill.due_day.in_(due_days)).all()
     if not bills:
         console.print("[green]No bills due soon![/green]")
         return
@@ -229,11 +229,10 @@ def import_csv(
         )
     added = 0
     skipped = 0
-    with open(path, newline="") as csvfile:
+    with open(path, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         required = {"name", "recipient", "due_day", "amount"}
-        missing = required - set(reader.fieldnames or [])
-        if missing:
+        if missing := required - set(reader.fieldnames or []):
             console.print(f"[red]Missing required columns: {', '.join(missing)}[/red]")
             raise typer.Exit(1)
         for i, row in enumerate(reader, 1):
@@ -242,7 +241,7 @@ def import_csv(
                 recipient = row["recipient"].strip()
                 due_day = int(row["due_day"])
                 amount = float(row["amount"])
-                paid = str(row.get("paid", "")).strip().lower() in ("true", "1", "yes")
+                paid = str(row.get("paid", "")).strip().lower() in {"true", "1", "yes"}
                 db.add(
                     Bill(
                         name=name,
@@ -269,7 +268,7 @@ def export_csv(
 
     db: Session = next(get_db())
     bills = db.query(Bill).all()
-    with open(path, "w", newline="") as csvfile:
+    with open(path, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(
             csvfile, fieldnames=["name", "recipient", "due_day", "amount", "paid"]
         )
@@ -285,6 +284,18 @@ def export_csv(
                 }
             )
     console.print(f"[green]Exported {len(bills)} bill(s) to {path}.[/green]")
+
+
+@app.command()
+def version():
+    """Prints the version of the tool."""
+    try:
+        from importlib.metadata import version
+
+        nmba_version = version("nmba")
+        console.print(f"nmba version {nmba_version}")
+    except ImportError:
+        console.print("importlib.metadata not found")
 
 
 if __name__ == "__main__":
