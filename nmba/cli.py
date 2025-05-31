@@ -232,5 +232,25 @@ def import_csv(path: str = typer.Argument(..., help="Path to CSV file with bills
     console.print(f"[green]Imported {added} bill(s). Skipped {skipped} row(s).[/green]")
 
 
+@app.command()
+def export_csv(path: str = typer.Argument(..., help="Path to write CSV file with bills")):
+    """Export all bills to a CSV file. Columns: name, recipient, due_day, amount, paid."""
+    import csv
+    db: Session = next(get_db())
+    bills = db.query(Bill).all()
+    with open(path, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['name', 'recipient', 'due_day', 'amount', 'paid'])
+        writer.writeheader()
+        for bill in bills:
+            writer.writerow({
+                'name': bill.name,
+                'recipient': bill.recipient,
+                'due_day': bill.due_day,
+                'amount': f"{bill.amount:.2f}",
+                'paid': str(bool(bill.paid))
+            })
+    console.print(f"[green]Exported {len(bills)} bill(s) to {path}.[/green]")
+
+
 if __name__ == "__main__":
     app()

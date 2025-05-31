@@ -1,0 +1,10 @@
+name,recipient,due_day,amount,paid
+Chase,Chase Bank,15,50.00,False
+Upstart,Upstart,1,100.00,False
+Rocket,Rocket Loans,15,200.00,False
+Rent,Landlord,1,1200.00,True
+Internet,Comcast,5,60.00,False
+Phone,Verizon,10,45.50,False
+Gym,Anytime Fitness,15,35.00,False
+Electric,Power Co,20,90.25,True
+Water,City Utilities,25,40.00,False
