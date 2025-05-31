@@ -1,7 +1,3 @@
 name,recipient,due_day,amount,paid
 Rent,Landlord,1,1200.00,True
 Internet,Comcast,5,60.00,
-Phone,Verizon,10,45.50,False
-Gym,Anytime Fitness,15,35.00,
-Electric,Power Co,20,90.25,True
-Water,City Utilities,25,40.00,

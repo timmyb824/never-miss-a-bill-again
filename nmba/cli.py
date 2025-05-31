@@ -202,28 +202,56 @@ def mark_all_unpaid():
 
 
 @app.command()
-def import_csv(path: str = typer.Argument(..., help="Path to CSV file with bills")):
-    """Import bills from a CSV file. Required columns: name, recipient, due_day, amount. Optional: paid."""
+def remove_all_bills():
+    """Remove all bills from the database."""
+    db: Session = next(get_db())
+    deleted = db.query(Bill).delete()
+    db.commit()
+    console.print(f"[green]Removed {deleted} bill(s) from the database.[/green]")
+
+
+@app.command()
+def import_csv(
+    path: str = typer.Argument(..., help="Path to CSV file with bills"),
+    overwrite: bool = typer.Option(
+        False, "--overwrite", help="Delete all existing bills before import"
+    ),
+):
+    """Import bills from a CSV file. Required columns: name, recipient, due_day, amount. Optional: paid. Use --overwrite to clear all existing bills first."""
     import csv
 
     db: Session = next(get_db())
+    if overwrite:
+        deleted = db.query(Bill).delete()
+        db.commit()
+        console.print(
+            f"[yellow]Deleted {deleted} existing bill(s) before import.[/yellow]"
+        )
     added = 0
     skipped = 0
-    with open(path, newline='') as csvfile:
+    with open(path, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
-        required = {'name', 'recipient', 'due_day', 'amount'}
+        required = {"name", "recipient", "due_day", "amount"}
         missing = required - set(reader.fieldnames or [])
         if missing:
             console.print(f"[red]Missing required columns: {', '.join(missing)}[/red]")
             raise typer.Exit(1)
         for i, row in enumerate(reader, 1):
             try:
-                name = row['name'].strip()
-                recipient = row['recipient'].strip()
-                due_day = int(row['due_day'])
-                amount = float(row['amount'])
-                paid = str(row.get('paid', '')).strip().lower() in ('true', '1', 'yes')
-                db.add(Bill(name=name, recipient=recipient, due_day=due_day, amount=amount, paid=paid))
+                name = row["name"].strip()
+                recipient = row["recipient"].strip()
+                due_day = int(row["due_day"])
+                amount = float(row["amount"])
+                paid = str(row.get("paid", "")).strip().lower() in ("true", "1", "yes")
+                db.add(
+                    Bill(
+                        name=name,
+                        recipient=recipient,
+                        due_day=due_day,
+                        amount=amount,
+                        paid=paid,
+                    )
+                )
                 added += 1
             except Exception as e:
                 skipped += 1
@@ -233,22 +261,29 @@ def import_csv(path: str = typer.Argument(..., help="Path to CSV file with bills
 
 
 @app.command()
-def export_csv(path: str = typer.Argument(..., help="Path to write CSV file with bills")):
+def export_csv(
+    path: str = typer.Argument(..., help="Path to write CSV file with bills")
+):
     """Export all bills to a CSV file. Columns: name, recipient, due_day, amount, paid."""
     import csv
+
     db: Session = next(get_db())
     bills = db.query(Bill).all()
-    with open(path, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=['name', 'recipient', 'due_day', 'amount', 'paid'])
+    with open(path, "w", newline="") as csvfile:
+        writer = csv.DictWriter(
+            csvfile, fieldnames=["name", "recipient", "due_day", "amount", "paid"]
+        )
         writer.writeheader()
         for bill in bills:
-            writer.writerow({
-                'name': bill.name,
-                'recipient': bill.recipient,
-                'due_day': bill.due_day,
-                'amount': f"{bill.amount:.2f}",
-                'paid': str(bool(bill.paid))
-            })
+            writer.writerow(
+                {
+                    "name": bill.name,
+                    "recipient": bill.recipient,
+                    "due_day": bill.due_day,
+                    "amount": f"{bill.amount:.2f}",
+                    "paid": str(bool(bill.paid)),
+                }
+            )
     console.print(f"[green]Exported {len(bills)} bill(s) to {path}.[/green]")
 
 
