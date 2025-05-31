@@ -183,5 +183,23 @@ def mark_unpaid(bill_id: int = typer.Argument(..., help="Bill ID to mark as unpa
     console.print(f"[green]Marked bill ID {bill_id} as unpaid.[/green]")
 
 
+@app.command()
+def mark_all_paid():
+    """Mark ALL bills as paid."""
+    db: Session = next(get_db())
+    updated = db.query(Bill).update({Bill.paid: True})
+    db.commit()
+    console.print(f"[green]Marked {updated} bill(s) as paid.[/green]")
+
+
+@app.command()
+def mark_all_unpaid():
+    """Mark ALL bills as unpaid."""
+    db: Session = next(get_db())
+    updated = db.query(Bill).update({Bill.paid: False})
+    db.commit()
+    console.print(f"[green]Marked {updated} bill(s) as unpaid.[/green]")
+
+
 if __name__ == "__main__":
     app()
