@@ -300,5 +300,18 @@ def version():
         console.print("importlib.metadata not found")
 
 
+@app.command()
+def init():
+    """Initialize the database in ~/.never_miss_a_bill_again/nmba.db"""
+    import os
+
+    from nmba.data.database import DB_DIR, DB_PATH, engine
+    from nmba.data.models import Base
+
+    os.makedirs(DB_DIR, exist_ok=True)
+    Base.metadata.create_all(bind=engine)
+    console.print(f"[green]Initialized database at {DB_PATH}[/green]")
+
+
 if __name__ == "__main__":
     app()
