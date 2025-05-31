@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2025-05-31)
+
+### Features
+
+- **cli**: Add init command to initialize database in specified directory
+  ([`0ce1e87`](https://github.com/timmyb824/never-miss-a-bill-again/commit/0ce1e87c1f714faaeb8c5717077f2074d84db06d))
+
+
 ## v1.0.5 (2025-05-31)
 
 ### Refactoring
