@@ -49,7 +49,7 @@ jobs:
     needs: Test
     environment:
       name: production
-      url: https://pypi.org/project/nmba/
+      url: https://pypi.org/project/never-miss-a-bill-again/
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Release

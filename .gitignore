@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
+nmba.egg-info/
+nmba.db
 
 # Virtual environments
 .venv
