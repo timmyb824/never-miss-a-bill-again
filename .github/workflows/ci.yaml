@@ -43,13 +43,13 @@ jobs:
         shell: bash
         run: |
           export PYTHONPATH="${PYTHONPATH}:./nmba"
-          uv run python nmba/cli.py --version
+          uv run python nmba/cli.py version
 
   Release:
     needs: Test
     environment:
       name: production
-      url: https://pypi.org/project/python-containerchecker/
+      url: https://pypi.org/project/nmba/
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Release
@@ -110,7 +110,7 @@ jobs:
           python -m pip install \
           --index-url https://test.pypi.org/simple/ \
           --extra-index-url https://pypi.org/simple \
-          python-containerchecker
+          nmba
 
       - name: Clean up attestation files
         if: steps.test_install.outcome == 'success'
