@@ -173,6 +173,44 @@ def mark_paid(bill_id: int = typer.Argument(..., help="Bill ID to mark as paid")
 
 
 @app.command()
+def edit_bill(
+    bill_id: int = typer.Argument(..., help="Bill ID to edit"),
+    name: str = typer.Option(None, help="New name"),
+    recipient: str = typer.Option(None, help="New recipient"),
+    due_day: int = typer.Option(None, help="New due day (1-31)"),
+    amount: float = typer.Option(None, help="New amount"),
+    paid: bool = typer.Option(None, help="Paid status (true/false)"),
+):
+    """Edit a bill by ID. Only specified fields are updated."""
+    db: Session = next(get_db())
+    bill = db.query(Bill).filter(Bill.id == bill_id).first()
+    if not bill:
+        console.print(f"[red]No bill found with ID {bill_id}.[/red]")
+        raise typer.Exit(1)
+    updated = False
+    if name is not None:
+        bill.name = name
+        updated = True
+    if recipient is not None:
+        bill.recipient = recipient
+        updated = True
+    if due_day is not None:
+        bill.due_day = due_day
+        updated = True
+    if amount is not None:
+        bill.amount = amount
+        updated = True
+    if paid is not None:
+        bill.paid = paid
+        updated = True
+    if updated:
+        db.commit()
+        console.print(f"[green]Updated bill ID {bill_id}.[/green]")
+    else:
+        console.print("[yellow]No fields updated.[/yellow]")
+
+
+@app.command()
 def mark_unpaid(bill_id: int = typer.Argument(..., help="Bill ID to mark as unpaid")):
     """Mark a bill as unpaid by ID."""
     db: Session = next(get_db())
