@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2025-06-01)
+
+### Features
+
+- Add error handling decorator for CLI commands
+  ([`1e4c930`](https://github.com/timmyb824/never-miss-a-bill-again/commit/1e4c9309c3a5e5d83bc1b98fc7559ebf7b180216))
+
+
 ## v1.2.2 (2025-06-01)
 
 ### Code Style
