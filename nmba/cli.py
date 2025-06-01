@@ -113,8 +113,10 @@ def notify(
         table.add_row(
             bill.name, bill.recipient, str(bill.due_day), f"${bill.amount:.2f}"  # type: ignore
         )
+    total_due = sum(bill.amount for bill in bills)
     console.print("[yellow]Bills due soon:[/yellow]")
     console.print(table)
+    console.print(f"Total: ${total_due:.2f}")
     a = setup_apprise(db)
     if bills:
         msg = "\n".join(
@@ -123,7 +125,7 @@ def notify(
                 for bill in bills
             ]
         )
-        a.notify(body=msg, title="Upcoming Bills Reminder")
+        a.notify(body=msg, title=f"Upcoming Bills Reminder (Total: ${total_due:.2f})")
         console.print("[green]Notification sent via Apprise.[/green]")
 
 
