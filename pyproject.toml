@@ -1,6 +1,6 @@
 [project]
 name = "never-miss-a-bill-again"
-version = "1.2.1"
+version = "1.2.2"
 description = "Never miss a bill again"
 readme = "README.md"
 requires-python = ">=3.12"

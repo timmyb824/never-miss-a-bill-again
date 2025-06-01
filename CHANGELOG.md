@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.2 (2025-06-01)
+
+### Code Style
+
+- Update comparison operator from 'not' to '==' in bill filtering condition
+  ([`aa7d12a`](https://github.com/timmyb824/never-miss-a-bill-again/commit/aa7d12a3d59ec11aa2b214f5b00ad8ec2512ca37))
+
+
 ## v1.2.1 (2025-06-01)
 
 ### Bug Fixes
