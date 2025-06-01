@@ -330,12 +330,18 @@ def export_csv(
 def version():
     """Prints the version of the tool."""
     try:
-        from importlib.metadata import version
+        try:
+            from importlib.metadata import PackageNotFoundError, version
+        except ImportError:
+            from importlib_metadata import PackageNotFoundError, version  # type: ignore
 
-        nmba_version = version("nmba")
-        console.print(f"nmba version {nmba_version}")
+        try:
+            nmba_version = version("never-miss-a-bill-again")
+            console.print(f"never-miss-a-bill-again version {nmba_version}")
+        except PackageNotFoundError:
+            console.print("[red]Package not found. Did you install with pip?[/red]")
     except ImportError:
-        console.print("importlib.metadata not found")
+        console.print("[red]importlib.metadata and importlib_metadata not found[/red]")
 
 
 @app.command()
