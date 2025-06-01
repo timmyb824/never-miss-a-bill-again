@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-06-01)
+
+### Bug Fixes
+
+- Update version handling in CLI to handle different package names
+  ([`2afe81d`](https://github.com/timmyb824/never-miss-a-bill-again/commit/2afe81d5c58fd0067aab54fd3d99aac01f23daa3))
+
+
 ## v1.2.0 (2025-05-31)
 
 ### Features
