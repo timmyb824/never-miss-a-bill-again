@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.1 (2025-06-01)
+
+### Documentation
+
+- Add documentation and total amount to list_bills() in CLI and remove unnecessary imports
+  ([`e171548`](https://github.com/timmyb824/never-miss-a-bill-again/commit/e171548f330b845eb07b782580cab74de8b6e154))
+
+
 ## v1.3.0 (2025-06-01)
 
 ### Features
