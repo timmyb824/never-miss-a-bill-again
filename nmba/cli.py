@@ -75,7 +75,7 @@ def notify(
     db = next(get_db())
     today = datetime.date.today()
     due_days = [(today.day + i - 1) % 31 + 1 for i in range(lookahead_days)]
-    bills = db.query(Bill).filter(not Bill.paid, Bill.due_day.in_(due_days)).all()
+    bills = db.query(Bill).filter(Bill.paid == False, Bill.due_day.in_(due_days)).all()
     if not bills:
         console.print("[green]No bills due soon![/green]")
         return
