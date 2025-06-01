@@ -1,4 +1,5 @@
 import datetime
+import functools
 
 import apprise
 import typer
@@ -11,6 +12,18 @@ from nmba.data.models import Bill, Config
 
 app = typer.Typer()
 console = Console()
+
+
+def concise_errors(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+
+    return wrapper
 
 
 def get_db():
@@ -32,6 +45,7 @@ def setup_apprise(db):
 
 
 @app.command()
+@concise_errors
 def config_set_notify_target(url: str):
     """Set a notification target URL (Apprise). Run multiple times to add more."""
     db = next(get_db())
@@ -41,18 +55,19 @@ def config_set_notify_target(url: str):
 
 
 @app.command()
+@concise_errors
 def config_show():
     """Show current notification config."""
     db = next(get_db())
     if targets := db.query(Config).filter(Config.key == "notify_target").all():
         for t in targets:
             console.print(f"[cyan]{t.value}[/cyan]")
-
     else:
         console.print("[yellow]No notification targets set.[/yellow]")
 
 
 @app.command()
+@concise_errors
 def notify(
     lookahead_days: int = typer.Option(
         1,
@@ -71,11 +86,17 @@ def notify(
     Example crontab entry to run every morning at 8am:
       0 8 * * * /usr/bin/python3 /path/to/nmba/cli.py notify
     """
-
     db = next(get_db())
     today = datetime.date.today()
     due_days = [(today.day + i - 1) % 31 + 1 for i in range(lookahead_days)]
-    bills = db.query(Bill).filter(Bill.paid == False, Bill.due_day.in_(due_days)).all()
+    bills = (
+        db.query(Bill)
+        .filter(
+            Bill.paid == False,  # pylint: disable=singleton-comparison
+            Bill.due_day.in_(due_days),
+        )
+        .all()
+    )
     if not bills:
         console.print("[green]No bills due soon![/green]")
         return
@@ -104,6 +125,7 @@ def notify(
 
 # --- CRUD Commands ---
 @app.command()
+@concise_errors
 def add_bill():
     """Add a new bill."""
     db = next(get_db())
@@ -122,6 +144,7 @@ def add_bill():
 
 
 @app.command()
+@concise_errors
 def remove_bill(bill_id: int = typer.Argument(..., help="Bill ID to remove")):
     """Remove a bill by ID."""
     db = next(get_db())
@@ -135,6 +158,7 @@ def remove_bill(bill_id: int = typer.Argument(..., help="Bill ID to remove")):
 
 
 @app.command()
+@concise_errors
 def list_bills():
     """List all bills in a table."""
     db = next(get_db())
@@ -160,6 +184,7 @@ def list_bills():
 
 
 @app.command()
+@concise_errors
 def mark_paid(bill_id: int = typer.Argument(..., help="Bill ID to mark as paid")):
     """Mark a bill as paid by ID."""
     db: Session = next(get_db())
@@ -173,6 +198,7 @@ def mark_paid(bill_id: int = typer.Argument(..., help="Bill ID to mark as paid")
 
 
 @app.command()
+@concise_errors
 def edit_bill(
     bill_id: int = typer.Argument(..., help="Bill ID to edit"),
     name: str = typer.Option(None, help="New name"),
@@ -211,6 +237,7 @@ def edit_bill(
 
 
 @app.command()
+@concise_errors
 def mark_unpaid(bill_id: int = typer.Argument(..., help="Bill ID to mark as unpaid")):
     """Mark a bill as unpaid by ID."""
     db: Session = next(get_db())
@@ -224,6 +251,7 @@ def mark_unpaid(bill_id: int = typer.Argument(..., help="Bill ID to mark as unpa
 
 
 @app.command()
+@concise_errors
 def mark_all_paid():
     """Mark ALL bills as paid."""
     db: Session = next(get_db())
@@ -233,6 +261,7 @@ def mark_all_paid():
 
 
 @app.command()
+@concise_errors
 def mark_all_unpaid():
     """Mark ALL bills as unpaid."""
     db: Session = next(get_db())
@@ -242,6 +271,7 @@ def mark_all_unpaid():
 
 
 @app.command()
+@concise_errors
 def remove_all_bills():
     """Remove all bills from the database."""
     db: Session = next(get_db())
@@ -251,6 +281,7 @@ def remove_all_bills():
 
 
 @app.command()
+@concise_errors
 def import_csv(
     path: str = typer.Argument(..., help="Path to CSV file with bills"),
     overwrite: bool = typer.Option(
@@ -300,6 +331,7 @@ def import_csv(
 
 
 @app.command()
+@concise_errors
 def export_csv(
     path: str = typer.Argument(..., help="Path to write CSV file with bills")
 ):
@@ -327,6 +359,7 @@ def export_csv(
 
 
 @app.command()
+@concise_errors
 def version():
     """Prints the version of the tool."""
     try:
@@ -345,6 +378,7 @@ def version():
 
 
 @app.command()
+@concise_errors
 def init():
     """Initialize the database in ~/.never_miss_a_bill_again/nmba.db"""
     import os
