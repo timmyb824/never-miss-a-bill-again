@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.2 (2025-06-01)
+
+### Refactoring
+
+- Update notification message with total due amount
+  ([`1a6c2ee`](https://github.com/timmyb824/never-miss-a-bill-again/commit/1a6c2eece15ccd391e6a55bf05fa4fe8a1a942a5))
+
+
 ## v1.3.1 (2025-06-01)
 
 ### Documentation
