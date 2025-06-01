@@ -6,7 +6,11 @@ dist/
 wheels/
 *.egg-info
 nmba.egg-info/
+.pytest_cache/
+
+# Database
 nmba.db
+bills_testing.csv
 
 # Virtual environments
 .venv

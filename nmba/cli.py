@@ -1,5 +1,9 @@
+"""Never Miss a Bill Again CLI"""
+
+import csv
 import datetime
 import functools
+import os
 
 import apprise
 import typer
@@ -181,6 +185,7 @@ def list_bills():
         )
     console.print(f"Today's date: {datetime.date.today()}\n")
     console.print(table)
+    console.print(f"\nTotal: ${sum(bill.amount for bill in bills):.2f}")
 
 
 @app.command()
@@ -289,7 +294,6 @@ def import_csv(
     ),
 ):
     """Import bills from a CSV file. Required columns: name, recipient, due_day, amount. Optional: paid. Use --overwrite to clear all existing bills first."""
-    import csv
 
     db: Session = next(get_db())
     if overwrite:
@@ -336,8 +340,6 @@ def export_csv(
     path: str = typer.Argument(..., help="Path to write CSV file with bills")
 ):
     """Export all bills to a CSV file. Columns: name, recipient, due_day, amount, paid."""
-    import csv
-
     db: Session = next(get_db())
     bills = db.query(Bill).all()
     with open(path, "w", newline="", encoding="utf-8") as csvfile:
@@ -366,7 +368,7 @@ def version():
         try:
             from importlib.metadata import PackageNotFoundError, version
         except ImportError:
-            from importlib_metadata import PackageNotFoundError, version  # type: ignore
+            from importlib_metadata import PackageNotFoundError, version
 
         try:
             nmba_version = version("never-miss-a-bill-again")
@@ -381,8 +383,6 @@ def version():
 @concise_errors
 def init():
     """Initialize the database in ~/.never_miss_a_bill_again/nmba.db"""
-    import os
-
     from nmba.data.database import DB_DIR, DB_PATH, engine
     from nmba.data.models import Base
 
