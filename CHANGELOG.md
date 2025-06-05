@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2025-06-05)
+
+### Features
+
+- Add command to remove notification target URL
+  ([`459e6d2`](https://github.com/timmyb824/never-miss-a-bill-again/commit/459e6d295f1858f2e1223b6d558e6f6b8f57a886))
+
+
 ## v1.3.2 (2025-06-01)
 
 ### Refactoring
