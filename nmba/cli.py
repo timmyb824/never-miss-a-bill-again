@@ -60,6 +60,26 @@ def config_set_notify_target(url: str):
 
 @app.command()
 @concise_errors
+def config_remove_notify_target(url: str):
+    """Remove a notification target URL."""
+    db = next(get_db())
+    targets = db.query(Config).filter(Config.key == "notify_target").all()
+
+    if not targets:
+        console.print("[yellow]No notification targets set.[/yellow]")
+        raise typer.Exit(1)
+
+    for t in targets:
+        if t.value == url:
+            db.delete(t)
+            db.commit()
+            console.print(f"[green]Removed notification target:[/green] {url}")
+            return
+    console.print(f"[red]No notification target found:[/red] {url}")
+
+
+@app.command()
+@concise_errors
 def config_show():
     """Show current notification config."""
     db = next(get_db())
@@ -79,7 +99,7 @@ def notify(
         "-l",
         help="How many days ahead to check for due bills (e.g. -l 3 for 3 days)",
         show_default=True,
-    )
+    ),
 ):
     """
     Check for unpaid bills due within the next N days and print them.
@@ -111,7 +131,10 @@ def notify(
     table.add_column("Amount")
     for bill in bills:
         table.add_row(
-            bill.name, bill.recipient, str(bill.due_day), f"${bill.amount:.2f}"  # type: ignore
+            bill.name,
+            bill.recipient,
+            str(bill.due_day),
+            f"${bill.amount:.2f}",  # type: ignore
         )
     total_due = sum(bill.amount for bill in bills)
     console.print("[yellow]Bills due soon:[/yellow]")
@@ -121,7 +144,9 @@ def notify(
     if bills:
         msg = "\n".join(
             [
-                f"{bill.name} to {bill.recipient} due on day {bill.due_day} for ${bill.amount:.2f}"
+                f"{bill.name} to {bill.recipient} due on day {bill.due_day} for ${
+                    bill.amount:.2f
+                }"
                 for bill in bills
             ]
         )
@@ -145,7 +170,9 @@ def add_bill():
     db.add(bill)
     db.commit()
     console.print(
-        f"[green]Added bill:[/green] {name} for {recipient} (due day {due_day}, amount ${amount:.2f})"
+        f"[green]Added bill:[/green] {name} for {recipient} (due day {
+            due_day
+        }, amount ${amount:.2f})"
     )
 
 
@@ -339,7 +366,7 @@ def import_csv(
 @app.command()
 @concise_errors
 def export_csv(
-    path: str = typer.Argument(..., help="Path to write CSV file with bills")
+    path: str = typer.Argument(..., help="Path to write CSV file with bills"),
 ):
     """Export all bills to a CSV file. Columns: name, recipient, due_day, amount, paid."""
     db: Session = next(get_db())
