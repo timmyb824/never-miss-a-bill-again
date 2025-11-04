@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2025-11-04)
+
+### Features
+
+- Add automatic database migrations and remove config key constraint
+  ([`a801997`](https://github.com/timmyb824/never-miss-a-bill-again/commit/a801997ef45a7a836f5acd503f55bc9d59e79fef))
+
+
 ## v1.4.0 (2025-06-05)
 
 ### Features
