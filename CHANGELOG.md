@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.6.0 (2025-11-04)
+
+### Features
+
+- Add config table migration command for v1.5.0
+  ([`6da7155`](https://github.com/timmyb824/never-miss-a-bill-again/commit/6da7155317448b8d1d3b0e095178fa42c7df0dce))
+
+
 ## v1.5.0 (2025-11-04)
 
 ### Features
