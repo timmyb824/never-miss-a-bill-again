@@ -12,6 +12,7 @@ from rich.table import Table
 from sqlalchemy.orm import Session
 
 from nmba.data.database import SessionLocal
+from nmba.data.migrations import run_migrations
 from nmba.data.models import Bill, Config
 
 app = typer.Typer()
@@ -30,7 +31,14 @@ def concise_errors(func):
     return wrapper
 
 
+_migrations_run = False
+
+
 def get_db():
+    global _migrations_run
+    if not _migrations_run:
+        run_migrations()
+        _migrations_run = True
     db = SessionLocal()
     try:
         yield db
