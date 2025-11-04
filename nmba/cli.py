@@ -12,7 +12,6 @@ from rich.table import Table
 from sqlalchemy.orm import Session
 
 from nmba.data.database import SessionLocal
-from nmba.data.migrations import run_migrations
 from nmba.data.models import Bill, Config
 
 app = typer.Typer()
@@ -31,14 +30,7 @@ def concise_errors(func):
     return wrapper
 
 
-_migrations_run = False
-
-
 def get_db():
-    global _migrations_run
-    if not _migrations_run:
-        run_migrations()
-        _migrations_run = True
     db = SessionLocal()
     try:
         yield db
@@ -426,6 +418,82 @@ def init():
     os.makedirs(DB_DIR, exist_ok=True)
     Base.metadata.create_all(bind=engine)
     console.print(f"[green]Initialized database at {DB_PATH}[/green]")
+
+
+@app.command()
+@concise_errors
+def migrate_config():
+    """Migrate config table to support multiple notification targets (v1.5.0+)"""
+    from sqlalchemy import text
+
+    from nmba.data.database import DB_PATH, engine
+
+    if not os.path.exists(DB_PATH):
+        console.print("[yellow]Database not found. Run 'nmba init' first.[/yellow]")
+        raise typer.Exit(1)
+
+    with engine.connect() as conn:
+        # Check if migration is needed by looking at the table schema
+        result = conn.execute(
+            text("SELECT sql FROM sqlite_master WHERE type='table' AND name='config'")
+        ).fetchone()
+
+        if result is None:
+            console.print(
+                "[yellow]Config table not found. Nothing to migrate.[/yellow]"
+            )
+            return
+
+        table_sql = result[0]
+
+        # Check if UNIQUE constraint exists on key column
+        if "UNIQUE" not in table_sql.upper() or '"KEY"' not in table_sql.upper():
+            console.print("[green]✓ Migration already applied or not needed.[/green]")
+            return
+
+        console.print(
+            "[cyan]Migrating config table to support multiple notification targets...[/cyan]"
+        )
+
+        # Create new table without unique constraint
+        conn.execute(
+            text(
+                """
+            CREATE TABLE IF NOT EXISTS config_new (
+                id INTEGER NOT NULL,
+                key VARCHAR NOT NULL,
+                value VARCHAR NOT NULL,
+                PRIMARY KEY (id)
+            )
+        """
+            )
+        )
+        conn.execute(
+            text("CREATE INDEX IF NOT EXISTS ix_config_new_id ON config_new (id)")
+        )
+
+        # Copy data from old table to new table
+        conn.execute(
+            text(
+                "INSERT INTO config_new (id, key, value) SELECT id, key, value FROM config"
+            )
+        )
+
+        # Drop old table
+        conn.execute(text("DROP TABLE config"))
+
+        # Rename new table to config
+        conn.execute(text("ALTER TABLE config_new RENAME TO config"))
+
+        # Recreate index with correct name
+        conn.execute(text("DROP INDEX IF EXISTS ix_config_new_id"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_config_id ON config (id)"))
+
+        conn.commit()
+
+        console.print(
+            "[green]✓ Migration complete! You can now add multiple notification targets.[/green]"
+        )
 
 
 if __name__ == "__main__":
