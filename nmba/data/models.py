@@ -17,5 +17,5 @@ class Bill(Base):
 class Config(Base):
     __tablename__ = "config"
     id = Column(Integer, primary_key=True, index=True)
-    key = Column(String, unique=True, nullable=False)
+    key = Column(String, nullable=False)
     value = Column(String, nullable=False)
